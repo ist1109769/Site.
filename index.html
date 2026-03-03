@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>ChainGuard IoT — Cold Chain Integrity Monitor</title>
+    <meta name="description"
+        content="Real-time IoT cold chain monitoring for supermarket logistics. Reduce spoilage, eliminate blind spots, and cut costs with our integrated sensor-to-cloud platform." />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>tailwind.config = { theme: { extend: { colors: { brand: { 50: '#eff6ff', 100: '#dbeafe', 200: '#bfdbfe', 400: '#60a5fa', 500: '#3b82f6', 600: '#2563eb', 700: '#1d4ed8', 800: '#1e3a5f', 900: '#0f172a' }, alert: { 500: '#ef4444', 600: '#dc2626' } }, fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] } } } };</script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet" />
+    <style>
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+
+        @keyframes pulse-glow {
+
+            0%,
+            100% {
+                box-shadow: 0 0 8px rgba(59, 130, 246, .4)
+            }
+
+            50% {
+                box-shadow: 0 0 24px rgba(59, 130, 246, .7)
+            }
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0)
+            }
+
+            50% {
+                transform: translateY(-8px)
+            }
+        }
+
+        .fade-up {
+            animation: fadeUp .7s ease forwards;
+            opacity: 0
+        }
+
+        .delay-1 {
+            animation-delay: .15s
+        }
+
+        .delay-2 {
+            animation-delay: .3s
+        }
+
+        .delay-3 {
+            animation-delay: .45s
+        }
+
+        .delay-4 {
+            animation-delay: .6s
+        }
+
+        .glow {
+            animation: pulse-glow 3s infinite
+        }
+
+        .float-anim {
+            animation: float 4s ease-in-out infinite
+        }
+
+        .hero-bg {
+            background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 50%, #0f172a 100%)
+        }
+
+        .glass {
+            background: rgba(255, 255, 255, .05);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, .1)
+        }
+
+        .step-line::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 100%;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, #3b82f6, transparent)
+        }
+    </style>
+</head>
+
+<body class="font-sans text-gray-800 bg-white antialiased">
+
+    <!-- HEADER -->
+    <header id="header"
+        class="fixed top-0 w-full z-50 transition-all duration-300 bg-brand-900/90 backdrop-blur-md border-b border-white/10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
+            <a href="#" class="flex items-center gap-2">
+                <div class="w-8 h-8 rounded-lg bg-brand-500 flex items-center justify-center"><svg
+                        class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2"
+                        viewBox="0 0 24 24">
+                        <path
+                            d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6m6 0h6m-6 0V9a2 2 0 012-2h2a2 2 0 012 2v10m6 0v-4a2 2 0 00-2-2h-2a2 2 0 00-2 2v4" />
+                    </svg></div>
+                <span class="text-white font-bold text-lg tracking-tight">Chain<span
+                        class="text-brand-400">Guard</span></span>
+            </a>
+            <nav class="hidden md:flex items-center gap-8">
+                <a href="#problem" data-i18n="navProblem"
+                    class="text-gray-300 hover:text-white text-sm font-medium transition">Problem</a>
+                <a href="#how-it-works" data-i18n="navHow"
+                    class="text-gray-300 hover:text-white text-sm font-medium transition">How It Works</a>
+                <a href="#validation" data-i18n="navValidation"
+                    class="text-gray-300 hover:text-white text-sm font-medium transition">Validation</a>
+                <a href="#team" data-i18n="navTeam"
+                    class="text-gray-300 hover:text-white text-sm font-medium transition">Team</a>
+                <a href="#presentation" data-i18n="navPresentation"
+                    class="text-gray-300 hover:text-white text-sm font-medium transition">Presentation</a>
+            </nav>
+            <div class="flex items-center gap-3">
+                <button id="langToggle" onclick="toggleLang()"
+                    class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-white/20 hover:border-white/40 text-white text-sm font-medium transition cursor-pointer"><img
+                        src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 640 480'%3E%3Crect width='640' height='480' fill='%23006600'/%3E%3Crect x='0' width='256' height='480' fill='%23006600'/%3E%3Crect x='256' width='384' height='480' fill='%23FF0000'/%3E%3Ccircle cx='256' cy='240' r='80' fill='%23FFCC00' stroke='%23000' stroke-width='1'/%3E%3C/svg%3E"
+                        class="w-5 h-3.5 rounded-sm object-cover" alt="PT" /> PT</button>
+                <a href="#contact" data-i18n="navCta"
+                    class="hidden sm:inline-flex items-center px-4 py-2 rounded-lg bg-brand-500 hover:bg-brand-600 text-white text-sm font-semibold transition shadow-lg shadow-brand-500/25">Get
+                    in Touch</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- HERO -->
+    <section class="hero-bg relative min-h-screen flex items-center overflow-hidden pt-16">
+        <div class="absolute inset-0 opacity-20">
+            <div class="absolute inset-0"
+                style="background-image:radial-gradient(circle at 1px 1px,rgba(255,255,255,.15) 1px,transparent 0);background-size:40px 40px">
+            </div>
+        </div>
+        <div class="absolute top-20 right-10 w-72 h-72 bg-brand-500/20 rounded-full blur-3xl"></div>
+        <div class="absolute bottom-20 left-10 w-96 h-96 bg-brand-700/20 rounded-full blur-3xl"></div>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 relative z-10 grid lg:grid-cols-2 gap-12 items-center">
+            <div>
+                <div data-i18n="heroBadge"
+                    class="fade-up inline-flex items-center px-3 py-1 rounded-full bg-brand-500/20 border border-brand-400/30 text-brand-200 text-xs font-semibold mb-6 tracking-wide uppercase">
+                    Técnico Lisboa · Engineering Capstone</div>
+                <h1 class="fade-up delay-1 text-4xl sm:text-5xl lg:text-6xl font-black text-white leading-tight"><span
+                        data-i18n="heroTitle1">IoT Cold Chain</span><br /><span
+                        class="text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-cyan-400"
+                        data-i18n="heroTitle2">Integrity Monitor</span></h1>
+                <p data-i18n="heroDesc" class="fade-up delay-2 mt-6 text-lg text-gray-300 leading-relaxed max-w-xl">
+                    Real-time temperature and humidity monitoring for supermarket logistics — from truck to shelf.
+                    Eliminate blind spots, reduce spoilage, and cut operational costs with our sensor-to-cloud platform.
+                </p>
+                <div class="fade-up delay-3 flex flex-wrap gap-4 mt-8">
+                    <a href="#how-it-works" data-i18n="heroBtn1"
+                        class="px-6 py-3 rounded-lg bg-brand-500 hover:bg-brand-600 text-white font-semibold transition shadow-xl shadow-brand-500/30">Explore
+                        the Architecture →</a>
+                    <a href="#validation" data-i18n="heroBtn2"
+                        class="px-6 py-3 rounded-lg border border-white/20 hover:border-white/40 text-white font-semibold transition">See
+                        Validation Results</a>
+                </div>
+                <div class="fade-up delay-4 flex gap-8 mt-12">
+                    <div><span class="block text-3xl font-extrabold text-white">~3yr</span><span data-i18n="statBattery"
+                            class="text-xs text-gray-400 uppercase tracking-wider">Battery Life</span></div>
+                    <div class="w-px bg-white/20"></div>
+                    <div><span class="block text-3xl font-extrabold text-white">24/7</span><span
+                            data-i18n="statMonitoring"
+                            class="text-xs text-gray-400 uppercase tracking-wider">Monitoring</span></div>
+                    <div class="w-px bg-white/20"></div>
+                    <div><span class="block text-3xl font-extrabold text-white">2</span><span data-i18n="statPartners"
+                            class="text-xs text-gray-400 uppercase tracking-wider">Industry Partners</span></div>
+                </div>
+            </div>
+            <div class="fade-up delay-3 hidden lg:flex justify-center">
+                <div class="relative">
+                    <div
+                        class="w-80 h-80 rounded-2xl glass p-6 float-anim flex flex-col items-center justify-center text-center">
+                        <svg class="w-16 h-16 text-brand-400 mb-4" fill="none" stroke="currentColor" stroke-width="1.5"
+                            viewBox="0 0 24 24">
+                            <path d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <div class="text-6xl font-black text-white">2.1°C</div>
+                        <div data-i18n="dashTemp" class="text-sm text-gray-400 mt-1">Current Temp · Zone A</div>
+                        <div class="mt-4 flex items-center gap-2 text-green-400 text-sm font-semibold"><span
+                                class="w-2 h-2 rounded-full bg-green-400 glow"></span> <span data-i18n="dashSafe">Within
+                                Safe Range</span></div>
+                    </div>
+                    <div class="absolute -bottom-6 -right-6 w-40 p-4 rounded-xl glass text-center">
+                        <div class="text-2xl font-bold text-white">62%</div>
+                        <div data-i18n="dashHumidity" class="text-xs text-gray-400">Humidity</div>
+                    </div>
+                    <div
+                        class="absolute -top-4 -left-8 w-36 p-3 rounded-xl bg-alert-500/20 border border-alert-500/40 text-center">
+                        <div data-i18n="dashAlert" class="text-xs font-bold text-alert-500 uppercase">⚠ Alert</div>
+                        <div class="text-xs text-gray-300 mt-1">Zone C: 8.4°C</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- PROBLEM vs SOLUTION -->
+    <section id="problem" class="py-24 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <span data-i18n="pvsBadge"
+                    class="inline-block px-3 py-1 rounded-full bg-brand-100 text-brand-700 text-xs font-semibold uppercase tracking-wider mb-4">Why
+                    It Matters</span>
+                <h2 data-i18n="pvsTitle" class="text-3xl sm:text-4xl font-extrabold text-brand-900">The <span
+                        class="text-alert-600">Problem</span> vs. Our <span class="text-brand-600">Solution</span></h2>
+            </div>
+            <div class="grid md:grid-cols-2 gap-8">
+                <!-- Problem -->
+                <div
+                    class="relative rounded-2xl bg-white border border-red-200 shadow-lg p-8 hover:shadow-xl transition">
+                    <div data-i18n="probLabel"
+                        class="absolute -top-4 left-6 px-4 py-1 bg-alert-500 text-white text-xs font-bold rounded-full uppercase">
+                        The Problem</div>
+                    <ul class="space-y-5 mt-4">
+                        <li class="flex gap-4"><span
+                                class="flex-shrink-0 w-8 h-8 rounded-full bg-red-100 text-alert-600 flex items-center justify-center font-bold">✕</span>
+                            <div>
+                                <h4 data-i18n="probT1" class="font-semibold text-gray-900">Zero Real-Time Visibility
+                                </h4>
+                                <p data-i18n="probD1" class="text-sm text-gray-500 mt-1">Legacy loggers record data
+                                    locally with no live alerts, leaving excursions undetected for hours — or days.</p>
+                            </div>
+                        </li>
+                        <li class="flex gap-4"><span
+                                class="flex-shrink-0 w-8 h-8 rounded-full bg-red-100 text-alert-600 flex items-center justify-center font-bold">✕</span>
+                            <div>
+                                <h4 data-i18n="probT2" class="font-semibold text-gray-900">Manual, Error-Prone Processes
+                                </h4>
+                                <p data-i18n="probD2" class="text-sm text-gray-500 mt-1">Staff must physically retrieve
+                                    and download data from each device — slow, unreliable, and impossible to scale.</p>
+                            </div>
+                        </li>
+                        <li class="flex gap-4"><span
+                                class="flex-shrink-0 w-8 h-8 rounded-full bg-red-100 text-alert-600 flex items-center justify-center font-bold">✕</span>
+                            <div>
+                                <h4 data-i18n="probT3" class="font-semibold text-gray-900">Rigid, Proprietary Hardware
+                                </h4>
+                                <p data-i18n="probD3" class="text-sm text-gray-500 mt-1">Closed ecosystems lock
+                                    operators into expensive vendor contracts with no customization or integration
+                                    options.</p>
+                            </div>
+                        </li>
+                        <li class="flex gap-4"><span
+                                class="flex-shrink-0 w-8 h-8 rounded-full bg-red-100 text-alert-600 flex items-center justify-center font-bold">✕</span>
+                            <div>
+                                <h4 data-i18n="probT4" class="font-semibold text-gray-900">Massive Spoilage & Cost</h4>
+                                <p data-i18n="probD4" class="text-sm text-gray-500 mt-1">Missed temperature excursions
+                                    result in entire shipments of perishable goods being written off — a direct hit to
+                                    the bottom line.</p>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+                <!-- Solution -->
+                <div
+                    class="relative rounded-2xl bg-white border border-blue-200 shadow-lg p-8 hover:shadow-xl transition">
+                    <div data-i18n="solLabel"
+                        class="absolute -top-4 left-6 px-4 py-1 bg-brand-500 text-white text-xs font-bold rounded-full uppercase">
+                        Our Solution</div>
+                    <ul class="space-y-5 mt-4">
+                        <li class="flex gap-4"><span
+                                class="flex-shrink-0 w-8 h-8 rounded-full bg-blue-100 text-brand-600 flex items-center justify-center font-bold">✓</span>
+                            <div>
+                                <h4 data-i18n="solT1" class="font-semibold text-gray-900">Continuous Live Monitoring
+                                </h4>
+                                <p data-i18n="solD1" class="text-sm text-gray-500 mt-1">Sensors stream data in real time
+                                    to a cloud dashboard — excursions trigger instant alerts for immediate action.</p>
+                            </div>
+                        </li>
+                        <li class="flex gap-4"><span
+                                class="flex-shrink-0 w-8 h-8 rounded-full bg-blue-100 text-brand-600 flex items-center justify-center font-bold">✓</span>
+                            <div>
+                                <h4 data-i18n="solT2" class="font-semibold text-gray-900">Fully Automated Pipeline</h4>
+                                <p data-i18n="solD2" class="text-sm text-gray-500 mt-1">Data flows automatically from
+                                    sensor to cloud — no manual downloads, no human error, fully scalable.</p>
+                            </div>
+                        </li>
+                        <li class="flex gap-4"><span
+                                class="flex-shrink-0 w-8 h-8 rounded-full bg-blue-100 text-brand-600 flex items-center justify-center font-bold">✓</span>
+                            <div>
+                                <h4 data-i18n="solT3" class="font-semibold text-gray-900">Open & Flexible Architecture
+                                </h4>
+                                <p data-i18n="solD3" class="text-sm text-gray-500 mt-1">Modular design with standard
+                                    protocols (BLE, LPWAN) means easy integration and zero vendor lock-in.</p>
+                            </div>
+                        </li>
+                        <li class="flex gap-4"><span
+                                class="flex-shrink-0 w-8 h-8 rounded-full bg-blue-100 text-brand-600 flex items-center justify-center font-bold">✓</span>
+                            <div>
+                                <h4 data-i18n="solT4" class="font-semibold text-gray-900">Waste Elimination & ROI</h4>
+                                <p data-i18n="solD4" class="text-sm text-gray-500 mt-1">Proactive alerts prevent
+                                    spoilage before it happens, dramatically cutting product loss and operational
+                                    expenses.</p>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- TARGET INDUSTRIES -->
+    <section class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <span data-i18n="indBadge"
+                class="inline-block px-3 py-1 rounded-full bg-brand-100 text-brand-700 text-xs font-semibold uppercase tracking-wider mb-4">Cross-Industry
+                Impact</span>
+            <h2 data-i18n="indTitle" class="text-3xl sm:text-4xl font-extrabold text-brand-900 mb-12">Built for Critical
+                Supply Chains</h2>
+            <div class="grid md:grid-cols-3 gap-8">
+                <div
+                    class="group p-8 rounded-2xl bg-gray-50 hover:bg-brand-900 border border-gray-200 hover:border-brand-700 transition-all duration-300 hover:shadow-2xl">
+                    <div
+                        class="w-14 h-14 mx-auto rounded-xl bg-brand-100 group-hover:bg-brand-500/20 flex items-center justify-center mb-5 transition">
+                        <svg class="w-7 h-7 text-brand-600 group-hover:text-brand-400 transition" fill="none"
+                            stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path
+                                d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+                        </svg>
+                    </div>
+                    <h3 data-i18n="indName1" class="font-bold text-lg text-gray-900 group-hover:text-white transition">
+                        Pharma & Labs</h3>
+                    <p data-i18n="indDesc1" class="text-sm text-gray-500 group-hover:text-gray-300 mt-2 transition">
+                        Safeguard vaccines, biological samples, and reagents with precise, auditable temperature records
+                        that meet regulatory compliance.</p>
+                </div>
+                <div
+                    class="group p-8 rounded-2xl bg-gray-50 hover:bg-brand-900 border border-gray-200 hover:border-brand-700 transition-all duration-300 hover:shadow-2xl">
+                    <div
+                        class="w-14 h-14 mx-auto rounded-xl bg-brand-100 group-hover:bg-brand-500/20 flex items-center justify-center mb-5 transition">
+                        <svg class="w-7 h-7 text-brand-600 group-hover:text-brand-400 transition" fill="none"
+                            stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path d="M3 3h18v18H3V3zm4 4v4h4V7H7zm0 6v4h4v-4H7zm6-6v4h4V7h-4zm0 6v4h4v-4h-4z" />
+                        </svg>
+                    </div>
+                    <h3 data-i18n="indName2" class="font-bold text-lg text-gray-900 group-hover:text-white transition">
+                        Food Logistics</h3>
+                    <p data-i18n="indDesc2" class="text-sm text-gray-500 group-hover:text-gray-300 mt-2 transition">
+                        Protect fresh produce, dairy, and frozen goods across the entire distribution chain — from
+                        warehouse to supermarket shelf.</p>
+                </div>
+                <div
+                    class="group p-8 rounded-2xl bg-gray-50 hover:bg-brand-900 border border-gray-200 hover:border-brand-700 transition-all duration-300 hover:shadow-2xl">
+                    <div
+                        class="w-14 h-14 mx-auto rounded-xl bg-brand-100 group-hover:bg-brand-500/20 flex items-center justify-center mb-5 transition">
+                        <svg class="w-7 h-7 text-brand-600 group-hover:text-brand-400 transition" fill="none"
+                            stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                        </svg>
+                    </div>
+                    <h3 data-i18n="indName3" class="font-bold text-lg text-gray-900 group-hover:text-white transition">
+                        Chemical Industry</h3>
+                    <p data-i18n="indDesc3" class="text-sm text-gray-500 group-hover:text-gray-300 mt-2 transition">
+                        Monitor temperature-sensitive chemicals and hazardous materials throughout transport, ensuring
+                        safety standards and regulatory adherence.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- HOW IT WORKS -->
+    <section id="how-it-works" class="py-24 bg-brand-900 relative overflow-hidden">
+        <div class="absolute inset-0 opacity-10"
+            style="background-image:radial-gradient(circle at 1px 1px,rgba(255,255,255,.15) 1px,transparent 0);background-size:32px 32px">
+        </div>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="text-center mb-16">
+                <span data-i18n="hiwBadge"
+                    class="inline-block px-3 py-1 rounded-full bg-brand-500/20 border border-brand-400/30 text-brand-200 text-xs font-semibold uppercase tracking-wider mb-4">System
+                    Architecture</span>
+                <h2 data-i18n="hiwTitle" class="text-3xl sm:text-4xl font-extrabold text-white">How It Works</h2>
+                <p data-i18n="hiwDesc" class="mt-4 text-gray-400 max-w-2xl mx-auto">A four-stage pipeline that
+                    transforms raw sensor readings into actionable intelligence — fully automated, end to end.</p>
+            </div>
+            <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div class="relative group p-6 rounded-2xl glass hover:bg-white/10 transition-all duration-300">
+                    <div
+                        class="w-10 h-10 rounded-lg bg-brand-500 flex items-center justify-center text-white font-bold text-sm mb-4">
+                        01</div>
+                    <h3 data-i18n="hiwName1" class="font-bold text-white text-lg mb-2">Sense</h3>
+                    <p data-i18n="hiwDesc1" class="text-sm text-gray-400">Temperature & humidity sensors continuously
+                        monitor environmental conditions inside refrigerated trucks in real time.</p>
+                    <div class="hidden lg:block absolute top-1/2 -right-3 w-6 text-brand-400 -translate-y-1/2"><svg
+                            fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path d="M9 5l7 7-7 7" />
+                        </svg></div>
+                </div>
+                <div class="relative group p-6 rounded-2xl glass hover:bg-white/10 transition-all duration-300">
+                    <div
+                        class="w-10 h-10 rounded-lg bg-brand-500 flex items-center justify-center text-white font-bold text-sm mb-4">
+                        02</div>
+                    <h3 data-i18n="hiwName2" class="font-bold text-white text-lg mb-2">Process</h3>
+                    <p data-i18n="hiwDesc2" class="text-sm text-gray-400">An onboard microcontroller (MCU) collects
+                        readings, performs edge processing, and checks against critical threshold violations.</p>
+                    <div class="hidden lg:block absolute top-1/2 -right-3 w-6 text-brand-400 -translate-y-1/2"><svg
+                            fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path d="M9 5l7 7-7 7" />
+                        </svg></div>
+                </div>
+                <div class="relative group p-6 rounded-2xl glass hover:bg-white/10 transition-all duration-300">
+                    <div
+                        class="w-10 h-10 rounded-lg bg-brand-500 flex items-center justify-center text-white font-bold text-sm mb-4">
+                        03</div>
+                    <h3 data-i18n="hiwName3" class="font-bold text-white text-lg mb-2">Transmit</h3>
+                    <p data-i18n="hiwDesc3" class="text-sm text-gray-400">Data is transmitted wirelessly via Bluetooth
+                        or LPWAN (low-power, long-range technology) to a centralized cloud platform.</p>
+                    <div class="hidden lg:block absolute top-1/2 -right-3 w-6 text-brand-400 -translate-y-1/2"><svg
+                            fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path d="M9 5l7 7-7 7" />
+                        </svg></div>
+                </div>
+                <div class="group p-6 rounded-2xl glass hover:bg-white/10 transition-all duration-300">
+                    <div
+                        class="w-10 h-10 rounded-lg bg-brand-500 flex items-center justify-center text-white font-bold text-sm mb-4">
+                        04</div>
+                    <h3 data-i18n="hiwName4" class="font-bold text-white text-lg mb-2">Alert</h3>
+                    <p data-i18n="hiwDesc4" class="text-sm text-gray-400">The cloud platform analyzes incoming data on a
+                        live dashboard and automatically generates alerts for immediate intervention.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- VALIDATION & PARTNERS -->
+    <section id="validation" class="py-24 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <span data-i18n="valBadge"
+                    class="inline-block px-3 py-1 rounded-full bg-brand-100 text-brand-700 text-xs font-semibold uppercase tracking-wider mb-4">Real-World
+                    Validation</span>
+                <h2 data-i18n="valTitle" class="text-3xl sm:text-4xl font-extrabold text-brand-900">Proven with Physical
+                    Hardware Testing</h2>
+                <p data-i18n="valDesc" class="mt-4 text-gray-500 max-w-3xl mx-auto">Our system isn’t just theoretical.
+                    Every component has been rigorously tested — first in the lab for calibration, then in the field
+                    with industry partners to guarantee real-world feasibility.</p>
+            </div>
+            <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
+                <div
+                    class="p-6 rounded-2xl bg-white border border-gray-200 shadow-sm text-center hover:shadow-lg transition">
+                    <div class="text-4xl font-black text-brand-600">~3yr</div>
+                    <div data-i18n="valM1" class="text-sm text-gray-500 mt-2 font-medium">Battery Autonomy</div>
+                    <div class="w-12 h-1 bg-brand-500 rounded-full mx-auto mt-3"></div>
+                </div>
+                <div
+                    class="p-6 rounded-2xl bg-white border border-gray-200 shadow-sm text-center hover:shadow-lg transition">
+                    <div class="text-4xl font-black text-brand-600">Ultra</div>
+                    <div data-i18n="valM2" class="text-sm text-gray-500 mt-2 font-medium">Low Power Consumption</div>
+                    <div class="w-12 h-1 bg-brand-500 rounded-full mx-auto mt-3"></div>
+                </div>
+                <div
+                    class="p-6 rounded-2xl bg-white border border-gray-200 shadow-sm text-center hover:shadow-lg transition">
+                    <div class="text-4xl font-black text-brand-600">99%+</div>
+                    <div data-i18n="valM3" class="text-sm text-gray-500 mt-2 font-medium">Network Delivery Rate</div>
+                    <div class="w-12 h-1 bg-brand-500 rounded-full mx-auto mt-3"></div>
+                </div>
+                <div
+                    class="p-6 rounded-2xl bg-white border border-gray-200 shadow-sm text-center hover:shadow-lg transition">
+                    <div class="text-4xl font-black text-brand-600">±0.3°</div>
+                    <div data-i18n="valM4" class="text-sm text-gray-500 mt-2 font-medium">Sensor Accuracy</div>
+                    <div class="w-12 h-1 bg-brand-500 rounded-full mx-auto mt-3"></div>
+                </div>
+            </div>
+            <div class="text-center mb-8">
+                <h3 data-i18n="partTitle" class="text-2xl font-bold text-brand-900">Our Industry Partners</h3>
+                <p data-i18n="partDesc" class="text-gray-500 mt-2">Validated alongside leading institutions and
+                    enterprises in Portugal.</p>
+            </div>
+            <div class="flex flex-wrap justify-center items-center gap-12">
+                <div class="flex flex-col items-center gap-3 opacity-80 hover:opacity-100 transition">
+                    <div
+                        class="w-80 h-80 rounded-2xl bg-white shadow-md border border-gray-200 flex items-center justify-center p-6">
+                        <img src="insa_logo.png" alt="Instituto Nacional de Saúde Dr. Ricardo Jorge"
+                            class="w-full h-full object-contain" />
+                    </div>
+                    <span class="text-sm font-semibold text-gray-700 text-center leading-tight">Instituto
+                        Nacional<br />de Saúde Dr. Ricardo Jorge</span>
+                </div>
+                <div class="flex flex-col items-center gap-3 opacity-80 hover:opacity-100 transition">
+                    <div
+                        class="w-80 h-80 rounded-2xl bg-white shadow-md border border-gray-200 flex items-center justify-center p-6">
+                        <img src="transaire_logo.png" alt="Transaire" class="w-full h-full object-contain" />
+                    </div>
+                    <span class="text-sm font-semibold text-gray-700">Transaire</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- TEAM -->
+    <section id="team" class="py-24 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <span data-i18n="teamBadge"
+                    class="inline-block px-3 py-1 rounded-full bg-brand-100 text-brand-700 text-xs font-semibold uppercase tracking-wider mb-4">The
+                    People Behind The Tech</span>
+                <h2 data-i18n="teamTitle" class="text-3xl sm:text-4xl font-extrabold text-brand-900">Meet the Team</h2>
+                <p data-i18n="teamDesc" class="mt-4 text-gray-500">Engineering students from Técnico Lisboa, driven by
+                    innovation and real-world impact.</p>
+            </div>
+            <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+                <div
+                    class="group relative p-6 rounded-2xl bg-gray-50 border border-gray-200 hover:border-brand-300 hover:shadow-xl transition-all duration-300 text-center">
+                    <img src="francisco_motta.png" alt="Francisco Motta"
+                        class="w-24 h-24 mx-auto rounded-full object-cover mb-4 shadow-lg group-hover:scale-105 transition-transform" />
+                    <h3 class="font-bold text-lg text-gray-900">Francisco Motta</h3>
+                </div>
+                <div
+                    class="group relative p-6 rounded-2xl bg-gray-50 border border-gray-200 hover:border-brand-300 hover:shadow-xl transition-all duration-300 text-center">
+                    <img src="vasco_oliveira.png" alt="Vasco Oliveira"
+                        class="w-24 h-24 mx-auto rounded-full object-cover mb-4 shadow-lg group-hover:scale-105 transition-transform" />
+                    <h3 class="font-bold text-lg text-gray-900">Vasco Oliveira</h3>
+                </div>
+                <div
+                    class="group relative p-6 rounded-2xl bg-gray-50 border border-gray-200 hover:border-brand-300 hover:shadow-xl transition-all duration-300 text-center">
+                    <img src="joao_ferreira.png" alt="João Ferreira"
+                        class="w-24 h-24 mx-auto rounded-full object-cover mb-4 shadow-lg group-hover:scale-105 transition-transform" />
+                    <h3 class="font-bold text-lg text-gray-900">João Ferreira</h3>
+                </div>
+                <div
+                    class="group relative p-6 rounded-2xl bg-gray-50 border border-gray-200 hover:border-brand-300 hover:shadow-xl transition-all duration-300 text-center">
+                    <img src="francisco_mendonca.jpg" alt="Francisco Mendonça"
+                        class="w-24 h-24 mx-auto rounded-full object-cover mb-4 shadow-lg group-hover:scale-105 transition-transform" />
+                    <h3 class="font-bold text-lg text-gray-900">Francisco Mendonça</h3>
+                </div>
+                <div
+                    class="group relative p-6 rounded-2xl bg-gray-50 border border-gray-200 hover:border-brand-300 hover:shadow-xl transition-all duration-300 text-center">
+                    <img src="filipe_lavos.jpg" alt="Filipe Lavos"
+                        class="w-24 h-24 mx-auto rounded-full object-cover mb-4 shadow-lg group-hover:scale-105 transition-transform" />
+                    <h3 class="font-bold text-lg text-gray-900">Filipe Lavos</h3>
+                </div>
+                <div
+                    class="group relative p-6 rounded-2xl bg-gray-50 border border-gray-200 hover:border-brand-300 hover:shadow-xl transition-all duration-300 text-center">
+                    <img src="jose_guita.png" alt="José Guita"
+                        class="w-24 h-24 mx-auto rounded-full object-cover mb-4 shadow-lg group-hover:scale-105 transition-transform" />
+                    <h3 class="font-bold text-lg text-gray-900">José Guita</h3>
+                </div>
+            </div>
+            <div class="text-center">
+                <div class="inline-flex items-center gap-4 px-8 py-4 rounded-2xl bg-brand-50 border border-brand-200">
+                    <div
+                        class="w-14 h-14 rounded-full bg-brand-900 flex items-center justify-center text-white text-lg font-bold shadow-md">
+                        LC</div>
+                    <div class="text-left">
+                        <div data-i18n="mentorLabel"
+                            class="text-xs text-brand-600 font-semibold uppercase tracking-wider">Project Mentor</div>
+                        <div class="font-bold text-brand-900 text-lg">Prof. Luís Caldas de Oliveira</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- PRESENTATION -->
+    <section id="presentation" class="py-24 bg-brand-900 relative overflow-hidden">
+        <div class="absolute inset-0 opacity-10"
+            style="background-image:radial-gradient(circle at 1px 1px,rgba(255,255,255,.15) 1px,transparent 0);background-size:32px 32px">
+        </div>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="text-center mb-12">
+                <span data-i18n="presBadge"
+                    class="inline-block px-3 py-1 rounded-full bg-brand-500/20 border border-brand-400/30 text-brand-200 text-xs font-semibold uppercase tracking-wider mb-4">Project
+                    Presentation</span>
+                <h2 data-i18n="presTitle" class="text-3xl sm:text-4xl font-extrabold text-white">Our Presentation</h2>
+                <p data-i18n="presDesc" class="mt-4 text-gray-400 max-w-2xl mx-auto">Explore our full project
+                    presentation</p>
+            </div>
+            <div class="rounded-2xl overflow-hidden shadow-2xl border border-white/10 bg-white">
+                <iframe src="apresentacao.pdf" class="w-full" style="height: 75vh; min-height: 500px;" frameborder="0"
+                    title="ChainGuard Project Presentation"></iframe>
+            </div>
+            <div class="text-center mt-8">
+                <a href="apresentacao.pdf" download data-i18n="presDownload"
+                    class="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-brand-500 hover:bg-brand-600 text-white font-semibold transition shadow-xl shadow-brand-500/30">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                    </svg>
+                    Download PDF
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer id="contact" class="bg-brand-900 text-white py-16 border-t border-white/10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid md:grid-cols-3 gap-12 mb-12">
+                <div>
+                    <div class="flex items-center gap-2 mb-4">
+                        <div class="w-8 h-8 rounded-lg bg-brand-500 flex items-center justify-center"><svg
+                                class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2"
+                                viewBox="0 0 24 24">
+                                <path
+                                    d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6m6 0h6m-6 0V9a2 2 0 012-2h2a2 2 0 012 2v10m6 0v-4a2 2 0 00-2-2h-2a2 2 0 00-2 2v4" />
+                            </svg></div>
+                        <span class="font-bold text-lg">Chain<span class="text-brand-400">Guard</span></span>
+                    </div>
+                    <p data-i18n="footerDesc" class="text-gray-400 text-sm leading-relaxed">An academic engineering
+                        project from Instituto Superior Técnico (Técnico Lisboa), building the future of cold chain
+                        integrity monitoring.</p>
+                </div>
+                <div>
+                    <h4 data-i18n="footerLinks" class="text-sm font-bold uppercase tracking-wider text-gray-300 mb-4">
+                        Quick Links</h4>
+                    <ul class="space-y-2 text-sm text-gray-400">
+                        <li><a data-i18n="footerLinkProb" href="#problem" class="hover:text-white transition">The
+                                Problem</a></li>
+                        <li><a data-i18n="footerLinkHow" href="#how-it-works" class="hover:text-white transition">How It
+                                Works</a></li>
+                        <li><a data-i18n="footerLinkVal" href="#validation"
+                                class="hover:text-white transition">Validation</a></li>
+                        <li><a data-i18n="footerLinkPres" href="#presentation"
+                                class="hover:text-white transition">Presentation</a></li>
+                        <li><a data-i18n="footerLinkTeam" href="#team" class="hover:text-white transition">Team</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 data-i18n="footerContact" class="text-sm font-bold uppercase tracking-wider text-gray-300 mb-4">
+                        Get in Touch</h4>
+                    <p data-i18n="footerContactDesc" class="text-sm text-gray-400 leading-relaxed">Interested in our
+                        project or exploring collaboration opportunities? Reach out to the team via Técnico Lisboa.</p>
+                    <a href="mailto:jose.p.guita@tecnico.ulisboa.pt"
+                        class="inline-flex items-center gap-2 mt-4 px-4 py-2 rounded-lg bg-brand-500 hover:bg-brand-600 text-white text-sm font-semibold transition">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path
+                                d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
+                        </svg>
+                        <span data-i18n="footerContactBtn">Contact Us</span>
+                    </a>
+                </div>
+            </div>
+            <div class="pt-8 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <p data-i18n="footerCopy" class="text-xs text-gray-500">&copy; 2026 ChainGuard — IoT Cold Chain
+                    Integrity Monitor. Técnico Lisboa.</p>
+                <p data-i18n="footerTagline" class="text-xs text-gray-500">Built with precision. Validated with rigor.
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- i18n -->
+    <script src="i18n.js"></script>
+    <!-- Scroll Reveal Script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => { const o = new IntersectionObserver((e) => { e.forEach(i => { if (i.isIntersecting) { i.target.style.opacity = '1'; i.target.style.transform = 'translateY(0)'; o.unobserve(i.target) } }) }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' }); document.querySelectorAll('section > div').forEach(s => { s.style.opacity = '0'; s.style.transform = 'translateY(30px)'; s.style.transition = 'opacity 0.7s ease, transform 0.7s ease'; o.observe(s) }); const h = document.getElementById('header'); window.addEventListener('scroll', () => { h.classList.toggle('shadow-2xl', window.scrollY > 50) }) });
+    </script>
+</body>
+
+</html>
